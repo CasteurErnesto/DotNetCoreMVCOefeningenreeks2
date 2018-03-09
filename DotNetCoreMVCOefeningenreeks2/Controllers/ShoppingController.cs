@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using DotNetCoreMVCOefeningenreeks2.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCoreMVCOefeningenreeks2.Controllers
 {
@@ -19,7 +20,9 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
 
         public IActionResult Index()
         {
-            return View(db.ShopItem.ToList());
+            return View(db.ShopItem
+                    .FromSql($"Select * from ShopItem")
+                    .ToList());
         }
 
         [HttpGet]
@@ -29,6 +32,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(ShopItem shopItem)
         {
             if (ModelState.IsValid)
@@ -43,10 +47,58 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
             }
         }
 
-        public ViewResult Filter(string keyword)
+       [HttpGet]
+        public IActionResult Edit(int? id)
         {
-            return View();
-            //return View("Index", db.Maaltijd.FromSql($"Select * from Maaltijd  where Type = {keyword} ").ToList());
+            if (id != null)
+            {
+                ShopItem shopItemToEdit = db.ShopItem
+                        .FromSql($"Select * from ShopItem where Id = {id}")
+                        .SingleOrDefault();
+                return View(shopItemToEdit);
+            } else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(ShopItem shopItem)
+        {
+            if (ModelState.IsValid)
+            {
+                db.ShopItem.Update(shopItem);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View(shopItem);
+        }
+
+        public IActionResult Delete(int? id)
+        {
+            if (id != null) {
+                ShopItem shopItemToDelete = db.ShopItem
+                    .FromSql($"Select * from ShopItem where Id = {id}")
+                    .SingleOrDefault();
+                if(shopItemToDelete != null)
+                {
+                    db.ShopItem.Remove(shopItemToDelete);
+                    db.SaveChanges();
+                }
+            }
+            return RedirectToAction("Index");
+        }
+
+
+        public ViewResult Find(string item, int? aantal)
+        {
+            return View("Index", 
+                  db.ShopItem.FromSql(
+                      $"Select * from ShopItem " +
+                      $"where item like '{item ?? "%"}%' " +
+                      $"and Quantity <= {aantal ?? byte.MaxValue}")
+                  .ToList());
         }
     }
 }

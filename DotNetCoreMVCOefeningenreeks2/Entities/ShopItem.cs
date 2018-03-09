@@ -8,7 +8,10 @@ namespace DotNetCoreMVCOefeningenreeks2.Entities
     {
         [ScaffoldColumn(false)]
         public int Id { get; set; }
+        [Required(ErrorMessage ="Please enter text for {0}")]
         public string Item { get; set; }
+        [Required(ErrorMessage = "Please enter a value for {0}")]
+        [Range(minimum:1, maximum:5, ErrorMessage ="Please enter a value for {0} between {1} and {2}")]
         public byte Quantity { get; set; }
     }
 }
