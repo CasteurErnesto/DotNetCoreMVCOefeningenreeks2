@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using DotNetCoreMVCOefeningenreeks2.Entities;
+using DotNetCoreMVCOefeningenreeks2.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotNetCoreMVCOefeningenreeks2.Controllers
@@ -18,13 +19,16 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
             db = new MyShopLiContext();
         }
 
+        #region Index
         public IActionResult Index()
         {
             return View(db.ShopItem
                     .FromSql($"Select * from ShopItem")
                     .ToList());
         }
+        #endregion Index
 
+        #region Create
         [HttpGet]
         public ViewResult Create()
         {
@@ -46,8 +50,10 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
                 return View(shopItem);
             }
         }
+        #endregion Create
 
-       [HttpGet]
+        #region Edit
+        [HttpGet]
         public IActionResult Edit(int? id)
         {
             if (id != null)
@@ -55,11 +61,12 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
                 ShopItem shopItemToEdit = db.ShopItem
                         .FromSql($"Select * from ShopItem where Id = {id}")
                         .SingleOrDefault();
-                return View(shopItemToEdit);
-            } else
-            {
-                return NotFound();
-            }
+                if (shopItemToEdit != null)
+                {
+                    return View(shopItemToEdit);
+                }
+            } 
+            return View("Error", new ErrorViewModel());
         }
 
         [HttpPost]
@@ -74,7 +81,9 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
             }
             return View(shopItem);
         }
+        #endregion Edit
 
+        #region Delete
         public IActionResult Delete(int? id)
         {
             if (id != null) {
@@ -89,8 +98,9 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
             }
             return RedirectToAction("Index");
         }
+        #endregion Delete
 
-
+        #region Find
         public ViewResult Find(string item, int? aantal)
         {
             return View("Index", 
@@ -100,5 +110,6 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
                       $"and Quantity <= {aantal ?? byte.MaxValue}")
                   .ToList());
         }
+        #endregion Find
     }
 }
