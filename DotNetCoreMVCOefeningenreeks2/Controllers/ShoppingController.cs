@@ -41,8 +41,10 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.ShopItem.Add(shopItem);
-                db.SaveChanges();
+                db.Database
+                       .ExecuteSqlCommand($"Insert Into ShopItem (Item, Quantity) " +
+                                $"Values ('{shopItem.Item}', '{shopItem.Quantity}')");
+
                 return RedirectToAction("Index");
             }
             else
@@ -75,8 +77,11 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.ShopItem.Update(shopItem);
-                db.SaveChanges();
+                //db.ShopItem.Update(shopItem);
+                //db.SaveChanges();
+                db.Database.ExecuteSqlCommand($"Update ShopItem " +
+                                             $"Set Item = '{shopItem.Item}', Quantity = '{shopItem.Quantity}' " +
+                                              $"Where Id = {shopItem.Id} ");
                 return RedirectToAction("Index");
             }
             return View(shopItem);
@@ -92,8 +97,9 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
                     .SingleOrDefault();
                 if(shopItemToDelete != null)
                 {
-                    db.ShopItem.Remove(shopItemToDelete);
-                    db.SaveChanges();
+                    db.Database
+                     .ExecuteSqlCommand($"Delete From ShopItem " +
+                              $"Where Id = {id} ");
                 }
             }
             return RedirectToAction("Index");
