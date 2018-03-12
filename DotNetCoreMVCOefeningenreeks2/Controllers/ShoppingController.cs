@@ -77,8 +77,6 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (ModelState.IsValid)
             {
-                //db.ShopItem.Update(shopItem);
-                //db.SaveChanges();
                 db.Database.ExecuteSqlCommand($"Update ShopItem " +
                                              $"Set Item = '{shopItem.Item}', Quantity = '{shopItem.Quantity}' " +
                                               $"Where Id = {shopItem.Id} ");
