@@ -107,7 +107,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             return View("Index", 
                   db.ShopItem
-                  .Where(s => s.Item.StartsWith(item ?? "") && s.Quantity <= (aantal ?? int.MaxValue))
+                  .Where(s => s.Item.StartsWith(item ?? "") && s.Quantity <= (aantal ?? byte.MaxValue))
                   .Select(s => s)
                   .ToList());
         }
