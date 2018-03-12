@@ -23,7 +23,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         public IActionResult Index()
         {
             return View(db.ShopItem
-                    .FromSql($"Select * from ShopItem")
+                    .Select(s => s)
                     .ToList());
         }
         #endregion Index
@@ -41,10 +41,8 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Database
-                       .ExecuteSqlCommand($"Insert Into ShopItem (Item, Quantity) " +
-                                $"Values ('{shopItem.Item}', '{shopItem.Quantity}')");
-
+                db.ShopItem.Add(shopItem);
+                db.SaveChanges();
                 return RedirectToAction("Index");
             }
             else
@@ -61,7 +59,8 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
             if (id != null)
             {
                 ShopItem shopItemToEdit = db.ShopItem
-                        .FromSql($"Select * from ShopItem where Id = {id}")
+                        .Where(s => s.Id == id)
+                        .Select(s => s)
                         .SingleOrDefault();
                 if (shopItemToEdit != null)
                 {
@@ -77,9 +76,8 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Database.ExecuteSqlCommand($"Update ShopItem " +
-                                             $"Set Item = '{shopItem.Item}', Quantity = '{shopItem.Quantity}' " +
-                                              $"Where Id = {shopItem.Id} ");
+                db.ShopItem.Update(shopItem);
+                db.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(shopItem);
@@ -91,13 +89,13 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (id != null) {
                 ShopItem shopItemToDelete = db.ShopItem
-                    .FromSql($"Select * from ShopItem where Id = {id}")
-                    .SingleOrDefault();
-                if(shopItemToDelete != null)
+                      .Where(s => s.Id == id)
+                      .Select(s => s)
+                      .SingleOrDefault();
+                if (shopItemToDelete != null)
                 {
-                    db.Database
-                     .ExecuteSqlCommand($"Delete From ShopItem " +
-                              $"Where Id = {id} ");
+                    db.ShopItem.Remove(shopItemToDelete);
+                    db.SaveChanges();
                 }
             }
             return RedirectToAction("Index");
@@ -108,10 +106,9 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         public ViewResult Find(string item, int? aantal)
         {
             return View("Index", 
-                  db.ShopItem.FromSql(
-                      $"Select * from ShopItem " +
-                      $"where item like '{item ?? "%"}%' " +
-                      $"and Quantity <= {aantal ?? byte.MaxValue}")
+                  db.ShopItem
+                  .Where(s => s.Item.StartsWith(item ?? "") && s.Quantity <= (aantal ?? int.MaxValue))
+                  .Select(s => s)
                   .ToList());
         }
         #endregion Find
