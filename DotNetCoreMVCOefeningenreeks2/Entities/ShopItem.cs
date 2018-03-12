@@ -4,6 +4,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DotNetCoreMVCOefeningenreeks2.Entities
 {
+    public enum Suggestion
+    {
+        Chocolade = 1,
+        Yoghurt,
+        Melk,
+        Chips,
+        Koffie
+    }
     public partial class ShopItem
     {
         [ScaffoldColumn(false)]

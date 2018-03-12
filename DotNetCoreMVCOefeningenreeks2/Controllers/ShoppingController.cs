@@ -32,6 +32,10 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         [HttpGet]
         public ViewResult Create()
         {
+            ViewBag.Suggestion = (Suggestion)
+                                    new Random()
+                                    .Next(1,(Enum.GetValues(typeof(Suggestion)).Length)+1);
+
             return View(new ShopItem());
         }
 
