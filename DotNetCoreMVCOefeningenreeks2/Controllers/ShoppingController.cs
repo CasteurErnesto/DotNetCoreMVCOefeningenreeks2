@@ -13,18 +13,19 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
 
     public class ShoppingController : Controller
     {
-        MyShopLiContext db;
-        public ShoppingController()
+        private MyShopLiContext db;
+
+        public ShoppingController(MyShopLiContext context)
         {
-            db = new MyShopLiContext();
+            db = context;
         }
 
         #region Index
         public IActionResult Index()
         {
             return View(db.ShopItem
-                    .Select(s => s)
-                    .ToList());
+                        .Select(s => s)
+                        .ToList());
         }
         #endregion Index
 
