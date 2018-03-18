@@ -7,6 +7,7 @@ using DotNetCoreMVCOefeningenreeks2.Common;
 using DotNetCoreMVCOefeningenreeks2.Entities;
 using DotNetCoreMVCOefeningenreeks2.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DotNetCoreMVCOefeningenreeks2.Controllers
 {
@@ -37,7 +38,21 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
             ViewBag.Suggestion = (Suggestion)
                                     new Random()
                                     .Next(1, (Enum.GetValues(typeof(Suggestion)).Length) + 1);
+            //List<SelectListItem> selectList = new List<SelectListItem>();
+             
 
+            ViewBag.CartId = db.Cart
+                        .Select(c => new SelectListItem()
+                        {
+                            Text = c.Name,
+                            Value = c.Id.ToString()
+                        }).ToList();
+            ViewBag.CategoryId = db.Category
+                                  .Select(c => new SelectListItem()
+                                  {
+                                      Text = c.Name,
+                                      Value = c.Id.ToString()
+                                  }).ToList();
             return View(new ShopItem());
         }
 
@@ -118,5 +133,11 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
                   .ToList());
         }
         #endregion Find
+
+        #region Private Methods
+       
+
+
+        #endregion
     }
 }
