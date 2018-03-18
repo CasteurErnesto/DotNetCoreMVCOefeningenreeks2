@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DotNetCoreMVCOefeningenreeks2.Controllers
 {
     //Scaffold-DbContext -Connection "Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MyShopLi;Integrated Security=True" -Provider Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Context MyShopLiContext
-    // Use the extra option -f to 'force' changes from the database
+    // Use the extra option -f to 'force' overwriting the current entities in your project
     public class ShoppingController : Controller
     {
         private MyShopLiContext db;

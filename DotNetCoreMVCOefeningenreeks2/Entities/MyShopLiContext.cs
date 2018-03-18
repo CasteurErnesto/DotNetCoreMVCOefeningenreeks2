@@ -6,10 +6,11 @@ namespace DotNetCoreMVCOefeningenreeks2.Entities
 {
     public partial class MyShopLiContext : DbContext
     {
-
+        public virtual DbSet<Cart> Cart { get; set; }
+        public virtual DbSet<Category> Category { get; set; }
         public virtual DbSet<ShopItem> ShopItem { get; set; }
 
-        public MyShopLiContext(DbContextOptions<MyShopLiContext> options) :base(options)
+        public MyShopLiContext(DbContextOptions<MyShopLiContext> options): base(options)
         {
 
         }
@@ -24,11 +25,35 @@ namespace DotNetCoreMVCOefeningenreeks2.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ShopItem>(entity =>
+            modelBuilder.Entity<Cart>(entity =>
             {
-                entity.Property(e => e.Item)
+                entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<ShopItem>(entity =>
+            {
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.HasOne(d => d.Cart)
+                    .WithMany(p => p.ShopItem)
+                    .HasForeignKey(d => d.CartId)
+                    .HasConstraintName("FK_ShopItem_Cart");
+
+                entity.HasOne(d => d.Category)
+                    .WithMany(p => p.ShopItem)
+                    .HasForeignKey(d => d.CategoryId)
+                    .HasConstraintName("FK_ShopItem_Category");
             });
         }
     }
