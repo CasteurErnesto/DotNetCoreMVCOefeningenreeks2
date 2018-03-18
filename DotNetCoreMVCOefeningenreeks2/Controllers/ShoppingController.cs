@@ -26,6 +26,8 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         public IActionResult Index()
         {
             return View(db.ShopItem
+                        .Include("Cart") //eager loading
+                        .Include("Category") //eager loading
                         .Select(s => s)
                         .ToList());
         }
@@ -38,16 +40,16 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
             ViewBag.Suggestion = (Suggestion)
                                     new Random()
                                     .Next(1, (Enum.GetValues(typeof(Suggestion)).Length) + 1);
-            //List<SelectListItem> selectList = new List<SelectListItem>();
-             
 
             ViewBag.CartId = db.Cart
-                        .Select(c => new SelectListItem()
-                        {
-                            Text = c.Name,
-                            Value = c.Id.ToString()
-                        }).ToList();
+                                .OrderBy(c => c.Name)
+                                .Select(c => new SelectListItem()
+                                {
+                                    Text = c.Name,
+                                    Value = c.Id.ToString()
+                                }).ToList();
             ViewBag.CategoryId = db.Category
+                                  .OrderBy(c => c.Name)
                                   .Select(c => new SelectListItem()
                                   {
                                       Text = c.Name,
@@ -68,6 +70,8 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
             }
             else
             {
+                ViewBag.CartId = db.Cart.OrderBy(c => c.Name).Select(c => new SelectListItem(){Text = c.Name,Value = c.Id.ToString()}).ToList();
+                ViewBag.CategoryId = db.Category.OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
                 return View(shopItem);
             }
         }
@@ -85,9 +89,11 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
                         .SingleOrDefault();
                 if (shopItemToEdit != null)
                 {
+                    ViewBag.CartId = db.Cart.OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
+                    ViewBag.CategoryId = db.Category.OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
                     return View(shopItemToEdit);
                 }
-            } 
+            }
             return View("Error", new ErrorViewModel());
         }
 
@@ -101,6 +107,8 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
+            ViewBag.CartId = db.Cart.OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
+            ViewBag.CategoryId = db.Category.OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
             return View(shopItem);
         }
         #endregion Edit
@@ -108,7 +116,8 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         #region Delete
         public IActionResult Delete(int? id)
         {
-            if (id != null) {
+            if (id != null)
+            {
                 ShopItem shopItemToDelete = db.ShopItem
                       .Where(s => s.Id == id)
                       .Select(s => s)
@@ -126,7 +135,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         #region Find
         public ViewResult Find(string item, int? aantal)
         {
-            return View("Index", 
+            return View("Index",
                   db.ShopItem
                   .Where(s => s.Name.StartsWith(item ?? "") && s.Quantity <= (aantal ?? byte.MaxValue))
                   .Select(s => s)
@@ -134,10 +143,5 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         }
         #endregion Find
 
-        #region Private Methods
-       
-
-
-        #endregion
     }
 }
