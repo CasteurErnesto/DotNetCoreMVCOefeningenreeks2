@@ -4,24 +4,23 @@ using System.Linq;
 using System.Threading.Tasks;
 using DotNetCoreMVCOefeningenreeks2.Entities;
 using DotNetCoreMVCOefeningenreeks2.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetCoreMVCOefeningenreeks2.Controllers
 {
-    public class CartsController : Controller
+    public class CategoriesController : Controller
     {
         private MyShopLiContext db;
 
-        public CartsController(MyShopLiContext context)
+        public CategoriesController(MyShopLiContext context)
         {
             db = context;
         }
-       
+
         #region Index
         public IActionResult Index()
         {
-            return View(db.Cart
+            return View(db.Category
                         .Select(c => c)
                         .ToList());
         }
@@ -31,22 +30,22 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         [HttpGet]
         public ViewResult Create()
         {
-            return View(new Cart());
+            return View(new Category());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Cart cart)
+        public IActionResult Create(Category category)
         {
             if (ModelState.IsValid)
             {
-                db.Cart.Add(cart);
+                db.Category.Add(category);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
             else
             {
-                return View(cart);
+                return View(category);
             }
         }
         #endregion Create
@@ -57,13 +56,13 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (id != null)
             {
-                Cart cartToEdit = db.Cart
+                Category categoryEdit = db.Category
                         .Where(c => c.Id == id)
                         .Select(c => c)
                         .SingleOrDefault();
-                if (cartToEdit != null)
+                if (categoryEdit != null)
                 {
-                    return View(cartToEdit);
+                    return View(categoryEdit);
                 }
             }
             return View("Error", new ErrorViewModel());
@@ -71,15 +70,15 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Cart cart)
+        public IActionResult Edit(Category category)
         {
             if (ModelState.IsValid)
             {
-                db.Cart.Update(cart);
+                db.Category.Update(category);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View(cart);
+            return View(category);
         }
         #endregion Edit
 
@@ -88,13 +87,13 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (id != null)
             {
-                Cart cartToDelete = db.Cart
+                Category categoryToDelete = db.Category
                       .Where(c => c.Id == id)
                       .Select(c => c)
                       .SingleOrDefault();
-                if (cartToDelete != null)
+                if (categoryToDelete != null)
                 {
-                    db.Cart.Remove(cartToDelete);
+                    db.Category.Remove(categoryToDelete);
                     db.SaveChanges();
                 }
             }
