@@ -26,7 +26,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Entities
         {
             modelBuilder.Entity<ShopItem>(entity =>
             {
-                entity.Property(e => e.Item)
+                entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
             });
