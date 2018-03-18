@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using DotNetCoreMVCOefeningenreeks2.Common;
 using DotNetCoreMVCOefeningenreeks2.Entities;
 using DotNetCoreMVCOefeningenreeks2.Models;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DotNetCoreMVCOefeningenreeks2.Controllers
 {
     //Scaffold-DbContext -Connection "Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=MyShopLi;Integrated Security=True" -Provider Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Context MyShopLiContext
-
+    // Use the extra option -f to 'force' changes from the database
     public class ShoppingController : Controller
     {
         private MyShopLiContext db;
@@ -35,7 +36,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             ViewBag.Suggestion = (Suggestion)
                                     new Random()
-                                    .Next(1,(Enum.GetValues(typeof(Suggestion)).Length)+1);
+                                    .Next(1, (Enum.GetValues(typeof(Suggestion)).Length) + 1);
 
             return View(new ShopItem());
         }
