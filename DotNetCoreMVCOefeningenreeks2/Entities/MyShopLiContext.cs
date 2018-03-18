@@ -23,7 +23,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Entities
             {
                 entity.Property(e => e.Id);
 
-                entity.Property(e => e.Item)
+                entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50);
             });
