@@ -4,25 +4,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using DotNetCoreMVCOefeningenreeks2.Entities;
 using DotNetCoreMVCOefeningenreeks2.Models;
+using DotNetCoreMVCOefeningenreeks2.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetCoreMVCOefeningenreeks2.Controllers
 {
     public class CategoriesController : Controller
     {
-        private MyShopLiContext db;
+        private CategoriesRepository categoriesRepository;
 
-        public CategoriesController(MyShopLiContext context)
+        public CategoriesController(CategoriesRepository repo)
         {
-            db = context;
+            categoriesRepository = repo;
         }
 
         #region Index
         public IActionResult Index()
         {
-            return View(db.Category
-                        .Select(c => c)
-                        .ToList());
+            return View(categoriesRepository.GetCategoryList());
         }
         #endregion Index
 
@@ -39,8 +38,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Category.Add(category);
-                db.SaveChanges();
+                categoriesRepository.CreateCategory(category);
                 return RedirectToAction("Index");
             }
             else
@@ -56,10 +54,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (id != null)
             {
-                Category categoryEdit = db.Category
-                        .Where(c => c.Id == id)
-                        .Select(c => c)
-                        .SingleOrDefault();
+                Category categoryEdit = categoriesRepository.GetCategory((int)id);
                 if (categoryEdit != null)
                 {
                     return View(categoryEdit);
@@ -74,8 +69,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Category.Update(category);
-                db.SaveChanges();
+                categoriesRepository.UpdateCategory(category);
                 return RedirectToAction("Index");
             }
             return View(category);
@@ -87,14 +81,10 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (id != null)
             {
-                Category categoryToDelete = db.Category
-                      .Where(c => c.Id == id)
-                      .Select(c => c)
-                      .SingleOrDefault();
+                Category categoryToDelete = categoriesRepository.GetCategory((int)id);
                 if (categoryToDelete != null)
                 {
-                    db.Category.Remove(categoryToDelete);
-                    db.SaveChanges();
+                    categoriesRepository.RemoveCategory(categoryToDelete);
                 }
             }
             return RedirectToAction("Index");

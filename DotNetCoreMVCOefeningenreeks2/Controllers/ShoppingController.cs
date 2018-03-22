@@ -8,6 +8,7 @@ using DotNetCoreMVCOefeningenreeks2.Entities;
 using DotNetCoreMVCOefeningenreeks2.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using DotNetCoreMVCOefeningenreeks2.Repositories;
 
 namespace DotNetCoreMVCOefeningenreeks2.Controllers
 {
@@ -15,21 +16,23 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
     // Use the extra option -f to 'force' overwriting the current entities in your project
     public class ShoppingController : Controller
     {
-        private MyShopLiContext db;
+        private ShopItemRepository shopItemRepository;
+        private CategoriesRepository categoriesRepository;
+        private CartRepository cartRepository;
 
-        public ShoppingController(MyShopLiContext context)
+        public ShoppingController(ShopItemRepository repo, 
+                                    CategoriesRepository catRepo,
+                                       CartRepository cartRepo)
         {
-            db = context;
+            shopItemRepository = repo;
+            categoriesRepository = catRepo;
+            cartRepository = cartRepo;
         }
 
         #region Index
         public IActionResult Index()
         {
-            return View(db.ShopItem
-                        .Include("Cart") //eager loading
-                        .Include("Category") //eager loading
-                        .Select(s => s)
-                        .ToList());
+            return View(shopItemRepository.GetShopItemList());
         }
         #endregion Index
 
@@ -41,14 +44,14 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
                                     new Random()
                                     .Next(1, (Enum.GetValues(typeof(Suggestion)).Length) + 1);
 
-            ViewBag.CartId = db.Cart
+            ViewBag.CartId = cartRepository.GetCartList()
                                 .OrderBy(c => c.Name)
                                 .Select(c => new SelectListItem()
                                 {
                                     Text = c.Name,
                                     Value = c.Id.ToString()
                                 }).ToList();
-            ViewBag.CategoryId = db.Category
+            ViewBag.CategoryId = categoriesRepository.GetCategoryList()
                                   .OrderBy(c => c.Name)
                                   .Select(c => new SelectListItem()
                                   {
@@ -64,14 +67,13 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.ShopItem.Add(shopItem);
-                db.SaveChanges();
+                shopItemRepository.CreateShopItem(shopItem);
                 return RedirectToAction("Index");
             }
             else
             {
-                ViewBag.CartId = db.Cart.OrderBy(c => c.Name).Select(c => new SelectListItem(){Text = c.Name,Value = c.Id.ToString()}).ToList();
-                ViewBag.CategoryId = db.Category.OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
+                ViewBag.CartId = cartRepository.GetCartList().OrderBy(c => c.Name).Select(c => new SelectListItem(){Text = c.Name,Value = c.Id.ToString()}).ToList();
+                ViewBag.CategoryId = categoriesRepository.GetCategoryList().OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
                 return View(shopItem);
             }
         }
@@ -83,14 +85,11 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (id != null)
             {
-                ShopItem shopItemToEdit = db.ShopItem
-                        .Where(s => s.Id == id)
-                        .Select(s => s)
-                        .SingleOrDefault();
+                ShopItem shopItemToEdit = shopItemRepository.GetShopItem((int)id);
                 if (shopItemToEdit != null)
                 {
-                    ViewBag.CartId = db.Cart.OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
-                    ViewBag.CategoryId = db.Category.OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
+                    ViewBag.CartId = cartRepository.GetCartList().OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
+                    ViewBag.CategoryId = categoriesRepository.GetCategoryList().OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
                     return View(shopItemToEdit);
                 }
             }
@@ -103,12 +102,11 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.ShopItem.Update(shopItem);
-                db.SaveChanges();
+                shopItemRepository.UpdateShopItem(shopItem);
                 return RedirectToAction("Index");
             }
-            ViewBag.CartId = db.Cart.OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
-            ViewBag.CategoryId = db.Category.OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
+            ViewBag.CartId = cartRepository.GetCartList().OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
+            ViewBag.CategoryId = categoriesRepository.GetCategoryList().OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
             return View(shopItem);
         }
         #endregion Edit
@@ -118,14 +116,10 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (id != null)
             {
-                ShopItem shopItemToDelete = db.ShopItem
-                      .Where(s => s.Id == id)
-                      .Select(s => s)
-                      .SingleOrDefault();
+                ShopItem shopItemToDelete = shopItemRepository.GetShopItem((int)id);
                 if (shopItemToDelete != null)
                 {
-                    db.ShopItem.Remove(shopItemToDelete);
-                    db.SaveChanges();
+                    shopItemRepository.RemoveShopItem(shopItemToDelete);
                 }
             }
             return RedirectToAction("Index");
@@ -133,13 +127,10 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         #endregion Delete
 
         #region Find
-        public ViewResult Find(string item, int? aantal)
+        public ViewResult Find(string item, int? quantity)
         {
             return View("Index",
-                  db.ShopItem
-                  .Where(s => s.Name.StartsWith(item ?? "") && s.Quantity <= (aantal ?? byte.MaxValue))
-                  .Select(s => s)
-                  .ToList());
+                  shopItemRepository.FindShopItemList(item ?? "", quantity ?? byte.MaxValue));
         }
         #endregion Find
 

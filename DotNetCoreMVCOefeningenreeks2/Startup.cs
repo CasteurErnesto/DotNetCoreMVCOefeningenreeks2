@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using DotNetCoreMVCOefeningenreeks2.Entities;
 using Microsoft.EntityFrameworkCore;
+using DotNetCoreMVCOefeningenreeks2.Repositories;
 
 namespace DotNetCoreMVCOefeningenreeks2
 {
@@ -26,7 +27,11 @@ namespace DotNetCoreMVCOefeningenreeks2
             services.AddMvc();
             services.AddDbContext<MyShopLiContext>(
                 options =>
-                         options.UseSqlServer(Configuration.GetConnectionString("MyShopLiDatabase")));
+                    options.UseSqlServer(Configuration.GetConnectionString("MyShopLiDatabase")));
+            services.AddScoped<ShopItemRepository>();
+            services.AddScoped<CartRepository>();
+            services.AddScoped<CategoriesRepository>();
+            services.AddScoped<MyShopLiContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

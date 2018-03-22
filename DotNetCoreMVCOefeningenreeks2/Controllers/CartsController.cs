@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DotNetCoreMVCOefeningenreeks2.Entities;
 using DotNetCoreMVCOefeningenreeks2.Models;
+using DotNetCoreMVCOefeningenreeks2.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,19 +12,17 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
 {
     public class CartsController : Controller
     {
-        private MyShopLiContext db;
+        private CartRepository cartRepository;
 
-        public CartsController(MyShopLiContext context)
+        public CartsController(CartRepository repo)
         {
-            db = context;
+            cartRepository = repo;
         }
        
         #region Index
         public IActionResult Index()
         {
-            return View(db.Cart
-                        .Select(c => c)
-                        .ToList());
+            return View(cartRepository.GetCartList());
         }
         #endregion Index
 
@@ -40,8 +39,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Cart.Add(cart);
-                db.SaveChanges();
+                cartRepository.CreateCart(cart);
                 return RedirectToAction("Index");
             }
             else
@@ -57,10 +55,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (id != null)
             {
-                Cart cartToEdit = db.Cart
-                        .Where(c => c.Id == id)
-                        .Select(c => c)
-                        .SingleOrDefault();
+                Cart cartToEdit = cartRepository.GetCart((int)id);
                 if (cartToEdit != null)
                 {
                     return View(cartToEdit);
@@ -75,8 +70,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Cart.Update(cart);
-                db.SaveChanges();
+                cartRepository.UpdateCart(cart);
                 return RedirectToAction("Index");
             }
             return View(cart);
@@ -88,14 +82,10 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         {
             if (id != null)
             {
-                Cart cartToDelete = db.Cart
-                      .Where(c => c.Id == id)
-                      .Select(c => c)
-                      .SingleOrDefault();
+                Cart cartToDelete = cartRepository.GetCart((int)id);
                 if (cartToDelete != null)
                 {
-                    db.Cart.Remove(cartToDelete);
-                    db.SaveChanges();
+                    cartRepository.RemoveCart(cartToDelete);
                 }
             }
             return RedirectToAction("Index");
