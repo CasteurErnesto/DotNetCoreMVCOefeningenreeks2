@@ -20,11 +20,11 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         private CategoriesRepository categoriesRepository;
         private CartRepository cartRepository;
 
-        public ShoppingController(ShopItemRepository repo, 
+        public ShoppingController(ShopItemRepository shopItemRepo, 
                                     CategoriesRepository catRepo,
                                        CartRepository cartRepo)
         {
-            shopItemRepository = repo;
+            shopItemRepository = shopItemRepo;
             categoriesRepository = catRepo;
             cartRepository = cartRepo;
         }
