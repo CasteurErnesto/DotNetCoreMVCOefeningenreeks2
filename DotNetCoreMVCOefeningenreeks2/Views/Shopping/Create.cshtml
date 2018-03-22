@@ -36,9 +36,15 @@
     </div>
 </div>
 <div>
-    <a asp-action="Index">Back to List</a>
+    @*<a asp-action="Index">Back to List</a>*@
+    <vc:shop-items-list
+         item="@ViewBag.item"
+         quantity="@ViewBag.quantity"
+                        >
+    </vc:shop-items-list>
+
 </div>
 @section footer
-    {
+{
     Why don't you buy @ViewBag.Suggestion?
 }
