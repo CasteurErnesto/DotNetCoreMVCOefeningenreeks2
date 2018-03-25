@@ -40,24 +40,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         [HttpGet]
         public ViewResult Create()
         {
-            ViewBag.Suggestion = (Suggestion)
-                                    new Random()
-                                    .Next(1, (Enum.GetValues(typeof(Suggestion)).Length) + 1);
-
-            ViewBag.CartId = cartRepository.GetCartList()
-                                .OrderBy(c => c.Name)
-                                .Select(c => new SelectListItem()
-                                {
-                                    Text = c.Name,
-                                    Value = c.Id.ToString()
-                                }).ToList();
-            ViewBag.CategoryId = categoriesRepository.GetCategoryList()
-                                  .OrderBy(c => c.Name)
-                                  .Select(c => new SelectListItem()
-                                  {
-                                      Text = c.Name,
-                                      Value = c.Id.ToString()
-                                  }).ToList();
+            (ViewBag.Suggestion, ViewBag.CartId, ViewBag.CategoryId) = getDDLItems();
             return View(new ShopItem());
         }
 
@@ -72,8 +55,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
             }
             else
             {
-                ViewBag.CartId = cartRepository.GetCartList().OrderBy(c => c.Name).Select(c => new SelectListItem(){Text = c.Name,Value = c.Id.ToString()}).ToList();
-                ViewBag.CategoryId = categoriesRepository.GetCategoryList().OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
+                (ViewBag.Suggestion, ViewBag.CartId, ViewBag.CategoryId) = getDDLItems();
                 return View(shopItem);
             }
         }
@@ -88,8 +70,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
                 ShopItem shopItemToEdit = shopItemRepository.GetShopItem((int)id);
                 if (shopItemToEdit != null)
                 {
-                    ViewBag.CartId = cartRepository.GetCartList().OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
-                    ViewBag.CategoryId = categoriesRepository.GetCategoryList().OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
+                    (ViewBag.Suggestion, ViewBag.CartId, ViewBag.CategoryId) = getDDLItems();
                     return View(shopItemToEdit);
                 }
             }
@@ -105,8 +86,7 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
                 shopItemRepository.UpdateShopItem(shopItem);
                 return RedirectToAction("Index");
             }
-            ViewBag.CartId = cartRepository.GetCartList().OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
-            ViewBag.CategoryId = categoriesRepository.GetCategoryList().OrderBy(c => c.Name).Select(c => new SelectListItem() { Text = c.Name, Value = c.Id.ToString() }).ToList();
+            (ViewBag.Suggestion, ViewBag.CartId, ViewBag.CategoryId) = getDDLItems();
             return View(shopItem);
         }
         #endregion Edit
@@ -133,6 +113,31 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
                   shopItemRepository.FindShopItemList(item ?? "", quantity ?? byte.MaxValue));
         }
         #endregion Find
+
+        #region Private Methods
+        private (Suggestion itemSuggestion, List<SelectListItem> carts, List<SelectListItem> categories) getDDLItems()
+        {
+            return (
+                (Suggestion)new Random().Next(1, (Enum.GetValues(typeof(Suggestion)).Length) + 1),
+                cartRepository.GetCartList()
+                                .OrderBy(c => c.Name)
+                                .Select(c => new SelectListItem()
+                                {
+                                    Text = c.Name,
+                                    Value = c.Id.ToString()
+                                }).ToList(),
+                categoriesRepository.GetCategoryList()
+                                  .OrderBy(c => c.Name)
+                                  .Select(c => new SelectListItem()
+                                  {
+                                      Text = c.Name,
+                                      Value = c.Id.ToString()
+                                  }).ToList()
+                );
+
+         #endregion
+
+        }
 
     }
 }
