@@ -26,8 +26,8 @@ namespace DotNetCoreMVCOefeningenreeks2.Controllers
         public IActionResult Index()
         {
             return View(db.ShopItem
-                        .Include("Cart") //eager loading
-                        .Include("Category") //eager loading
+                        .Include(s => s.Cart) //eager loading
+                        .Include(s => s.Category) //eager loading
                         .Select(s => s)
                         .ToList());
         }
